@@ -15,6 +15,7 @@ public class ServletProcessor1 {
 
         String uri = request.getUri();
         String servletName = uri.substring(uri.lastIndexOf("/") + 1);
+
         URLClassLoader loader = null;
 
         try {
@@ -35,12 +36,16 @@ public class ServletProcessor1 {
 
 
             loader = new URLClassLoader(urls);
+
         } catch (IOException e) {
             System.out.println(e.toString());
         }
+
         Class myClass = null;
         try {
+
             myClass = loader.loadClass(servletName);
+
         } catch (ClassNotFoundException e) {
             System.out.println(e.toString());
         }
@@ -49,7 +54,8 @@ public class ServletProcessor1 {
 
         try {
             servlet = (Servlet) myClass.newInstance();
-            servlet.service((ServletRequest) request, (ServletResponse) response);
+            servlet.service(request, response);
+
         } catch (Exception e) {
             System.out.println(e.toString());
         } catch (Throwable e) {
