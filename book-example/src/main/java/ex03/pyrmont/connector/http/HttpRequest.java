@@ -79,7 +79,7 @@ public class HttpRequest implements HttpServletRequest {
      * <code>getParameter()</code> family of method calls.  The key is the
      * parameter name, while the value is a String array of values for this
      * parameter.
-     * <p/>
+     * <p>
      * <strong>IMPLEMENTATION NOTE</strong> - Once the parameters for a
      * particular request are parsed and stored here, they are not modified.
      * Therefore, application level access to the parameters need not be

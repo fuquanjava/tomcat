@@ -54,6 +54,7 @@ public class ServletProcessor1 {
 
         try {
             servlet = (Servlet) myClass.newInstance();
+
             servlet.service(request, response);
 
         } catch (Exception e) {

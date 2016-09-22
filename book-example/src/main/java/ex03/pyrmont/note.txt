@@ -1,0 +1,17 @@
+
+
+连接器和它的支撑类(HttpConnector 和 HttpProcessor)。
+  指代 HTTP 请求的类(HttpRequest)和它的辅助类。
+  指代 HTTP 响应的类(HttpResponse)和它的辅助类。
+  Facade 类(HttpRequestFacade 和 HttpResponseFacade)。
+  Constant 类
+core 模块由两个类组成：ServletProcessor 和 StaticResourceProcessor。
+
+
+第 2 章中的 HttpServer 类被分离为两个类：HttpConnector 和 HttpProcessor
+
+Request 被 HttpRequest 所取代，而 Response 被 HttpResponse 所取代
+
+
+等待 HTTP 请求的工作交给 HttpConnector 实例，
+而创建请求和响应对象的工作交给了HttpProcessor 实例

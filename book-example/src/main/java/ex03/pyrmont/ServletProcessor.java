@@ -21,6 +21,7 @@ public class ServletProcessor {
         String servletName = uri.substring(uri.lastIndexOf("/") + 1);
         URLClassLoader loader = null;
         try {
+
             // create a URLClassLoader
             URL[] urls = new URL[1];
             URLStreamHandler streamHandler = null;
@@ -28,6 +29,8 @@ public class ServletProcessor {
             String repository = (new URL("file", null, classPath.getCanonicalPath() + File.separator)).toString();
             urls[0] = new URL(null, repository, streamHandler);
             loader = new URLClassLoader(urls);
+
+
         } catch (IOException e) {
             System.out.println(e.toString());
         }

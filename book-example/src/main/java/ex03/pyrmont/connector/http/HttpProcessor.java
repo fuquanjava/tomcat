@@ -45,6 +45,7 @@ public class HttpProcessor {
 
             // create HttpResponse object
             response = new HttpResponse(output);
+
             response.setRequest(request);
 
             response.setHeader("Server", "Pyrmont Servlet Container");
@@ -84,7 +85,6 @@ public class HttpProcessor {
             throws IOException, ServletException {
         while (true) {
             HttpHeader header = new HttpHeader();
-            ;
 
             // Read the next header
             input.readHeader(header);
