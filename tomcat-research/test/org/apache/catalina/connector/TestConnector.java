@@ -41,7 +41,7 @@ public class TestConnector extends TomcatBaseTest {
 
         Context root = tomcat.addContext("", TEMP_DIR);
         Wrapper w =
-            Tomcat.addServlet(root, "tester", new TesterServlet());
+                Tomcat.addServlet(root, "tester", new TesterServlet());
         w.setAsyncSupported(true);
         root.addServletMapping("/", "tester");
 

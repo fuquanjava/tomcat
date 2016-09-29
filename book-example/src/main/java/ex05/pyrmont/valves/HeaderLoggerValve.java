@@ -11,6 +11,9 @@ import org.apache.catalina.Valve;
 import org.apache.catalina.ValveContext;
 import org.apache.catalina.Contained;
 import org.apache.catalina.Container;
+import org.apache.catalina.comet.CometEvent;
+import org.apache.catalina.connector.Request;
+import org.apache.catalina.connector.Response;
 
 
 public class HeaderLoggerValve implements Valve, Contained {
@@ -51,5 +54,35 @@ public class HeaderLoggerValve implements Valve, Contained {
 
   public void setContainer(Container container) {
     this.container = container;
+  }
+
+  @Override
+  public Valve getNext() {
+    return null;
+  }
+
+  @Override
+  public void setNext(Valve valve) {
+
+  }
+
+  @Override
+  public void backgroundProcess() {
+
+  }
+
+  @Override
+  public void invoke(Request request, Response response) throws IOException, ServletException {
+
+  }
+
+  @Override
+  public void event(Request request, Response response, CometEvent event) throws IOException, ServletException {
+
+  }
+
+  @Override
+  public boolean isAsyncSupported() {
+    return false;
   }
 }

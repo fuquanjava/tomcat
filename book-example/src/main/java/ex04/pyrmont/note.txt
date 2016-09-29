@@ -1,0 +1,8 @@
+
+
+Tomcat 连接器是一个可以插入 servlet 容器的独立模块，已经存在相当多的连接器了，包
+括 Coyote, mod_jk, mod_jk2 和 mod_webapp。一个 Tomcat 连接器必须符合以下条件：
+1. 必须实现接口 org.apache.catalina.Connector。
+2. 必须创建请求对象，该请求对象的类必须实现接口 org.apache.catalina.Request。
+3. 必须创建响应对象，该响应对象的类必须实现接口 org.apache.catalina.Response。
+
