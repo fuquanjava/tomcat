@@ -1,3 +1,12 @@
+启动 ：
+-Dcatalina.home=catalina-home
+-Dcatalina.base=catalina-home
+-Djava.endorsed.dirs=catalina-home/endorsed
+-Djava.io.tmpdir=catalina-home/temp
+-Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager
+-Djava.util.logging.config.file=catalina-home/conf/logging.properties
+
+org.apache.catalina.startup.Bootstrap
 
 
 
@@ -15,3 +24,120 @@ org.apache.catalina.Container 接口定义了容器的形式，有四种容器�
 和 Wrapper 接口都实现了 Container 即可。它们的标准实现是 StandardEngine,
 StandardHost, StandardContext, and StandardWrapper，它们都是
 org.apache.catalina.core 包的一部分
+
+
+the Wrapper Interface Wrapper  接口 org.apache.catalina.Wrapper 接口表示了一个包装器。一个包装器是表示一个独立servlet定义的容器。
+    allocate() 定位一个servlet实例，并调用service()方法.并且会校验是否实现 SingleThreadModel 接口。
+
+The Context Interface  上下文（ Context ）接口 一个 context 在容器中表示一个 web 应用。 一个 context 通常含有一个或多个包装器作为其子容器。
+    重要的方法包括 addWrapper, createWrapper 等方法。
+
+
+Catalina 由多个组件组成，当 Catalina 启动的时候，这些组件也会启动。当Catalina 停止的时候，这些组件也必须有机会被清除。例如，当一个容器停止工作的时候，它必须唤醒所有加载的 servlet 的 destroy 方法，而 session 管理
+器要保存 session 到二级存储器中。
+保持组件启动和停止一致的的机制通过实现 org.apache.catalina.Lifecycle 接口来实现。一个实现了 Lifecycle 接口的组件同是会触发一个或多个下列事件：
+BEFORE_START_EVENT, START_EVENT, AFTER_START_EVENT, BEFORE_STOP_EVENT,STOP_EVENT, and AFTER_STOP_EVENT。
+当组件被启动的时候前三个事件会被触发，而组件停止的时候会触发后边三个事件。另外，如果一个组件可以触发事件，那么必须存在相应的监听器来对触发的事件作出回应。监听器使用
+org.apache.catalina.LifecycleListener 来表示。
+
+加载器
+    加载器，用它来加载 servlet 类， 一个 servlet 容器需要一个定制的容器，而不是简单的使用系统的加 载器。
+    如果像前面章节中那样使用系统的加载器来加载 servlet 和其他需要的类，这样 servlet 就可以进入 Java 虚拟机 CLASSPATH 环境下面的任何类和类库，这 会带来安全隐患。
+    Servlet 只允许访问 WEB-INF/目录及其子目录下面的类以及部署在WEB-INF/lib目录下的类库。
+    所以一个servlet容器需要一个自己的加载器， 该加载器遵守一些特定的规则来加载类。在 Catalina 中，加载器使用 org.apache.catalina.Loader 接口表示。
+    Tomcat 需要一个自己的加载器的另一个原因是它需要支持在 WEB-INF/classes
+    或者是 WEB-INF/lib 目录被改变的时候会重新加载。Tomcat 的加载器实现中使
+    用一个单独的线程来检查 servlet 和支持类文件的时间戳。 要支持类的自动加载
+    功能，一个加载器类必须实现 org.apache.catalina.loader.Reloader 接口
+
+    在每次创建一个 Java 类的实例时候，必须先将该类加载到内存中。Java 虚拟机
+    （JVM）使用类加载器来加载类。Java 加载器在 Java 核心类库和 CLASSPATH 环
+    境下面的所有类中查找类。如果需要的类找不到，会抛出
+    java.lang.ClassNotFoundException 异常。
+    从 J2SE1.2 开始，JVM 使用了三种类加载器：bootstrap 类加载器、extension
+    类加载器和 systen 类加载器。这三个加载器是父子关系，其中 bootstrap 类加
+    载器在顶端，而 system 加载器在结构的最底层。
+    其中 bootstrap 类加载器用于引导 JVM，一旦调用 java.exe 程序，bootstrap
+    类加载器就开始工作。因此，它必须使用本地代码实现，然后加载 JVM 需要的类
+    到函数中。 另外， 它还负责加载所有的 Java 核心类， 例如 java.lang 和 java.io
+    包。另外 bootstrap 类加载器还会查找核心类库如 rt.jar、i18n.jar 等，这些
+    类库根据 JVM 和操作系统来查找。
+    extension 类加载器负责加载标准扩展目录下面的类。这样就可以使得编写程序
+    变得简单，只需把 JAR 文件拷贝到扩展目录下面即可，类加载器会自动的在下面
+    查找。不同的供应商提供的扩展类库是不同的，Sun 公司的 JVM 的标准扩展目录
+    是/jdk/jre/lib/ext。
+
+    system 加载器是默认的加载器，它在环境变量 CLASSPATH 目录下面查找相应的
+    类。
+    这样，JVM 使用哪个类加载器？答案在于委派模型(delegation model)，这是出
+    于安全原因。每次一类需要加载，system 类加载器首先调用。但是，它不会马
+    上加载类。相反，它委派该任务给它的父类-extension 类加载器。extension
+    类加载器也把任务委派给它的父类 bootstrap 类加载器。因此，bootstrap 类加
+    载器总是首先加载类。如果 bootstrap 类加载器不能找到所需要的类的
+    extension 类加载器会尝试加载类。如果扩展类加载器也失败，system 类加载器
+    将 执 行 任 务 。 如 果 系 统 类 加 载 器 找 不 到 类 ， 一 个
+    java.lang.ClassNotFoundException 异常。为什么需要这样的往返模式？
+    委派模型对于安全性是非常重要的。如你所知，可以使用安全管理器来限制访问
+    某个目录。现在，恶意的意图有人能写出一类叫做 java.lang.Object，可用于
+    访问任何在硬盘上的目录。因为 JVM 的信任 java.lang.Object 类，它不会关注
+    这方面的活动。因此，如果自定义 java.lang.Object 被允许加载的安全管理器
+    将很容易瘫痪。 幸运的是， 这将不会发生， 因为委派模型会阻止这种情况的发生。
+    下面是它的工作原理。
+    当自定义 java.lang.Object 类在程序中被调用的时候，system 类加载器将该请
+    求委派给 extension 类加载器， 然后委派给 bootstrap 类加载器。 这样 bootstrap
+    类加载器先搜索的核心库，找到标准 java.lang.Object 并实例化它。这样，自
+    定义 java.lang.Object 类永远不会被加载
+    关于在 Java 类加载机制的优势在于可以通过扩展
+    java.lang.ClassLoader 抽象类来扩展自己的类加载器。
+
+WebappLoader  类
+    org.apache.catalina.loader.WebappLoader 类是 Loader 接口的实现，它表示一个 web 应用程序的加载器，负责给 web 应用程序加载类。
+    WebappLoader 创建 一个 org.apache.catalina.loader.WebappClassLoader 类的实例作为它的类加载器。
+    像其他的 Catalina 组件一样，WebappLoader 实现了org.apache.catalina.Lifecycle 接口，可有由关联容器启动和停止。
+
+
+session 管理
+    Catalina 通过一个叫管理器的组件来完成 session 管理工作，该组件由org.apache.catalina.Manager 接口表示。
+    一个管理器通常跟一个上下文容器相关联，它负责创建、更行以及销毁 session 对象并能给任何请求组件
+    返回一个合法的 session。一个 servlet 可以使用 getSession 方法获得一个 session 对象，该方法在javax.servlet.http.HttpServletRequest 定义。
+    它在默认连接器里由 org.apache.catalina.connector.HttpRequestBase 类实现。
+
+    StandardSession 类是 Session 接口的标准是实现。
+    另外，实现了javax.servlet.http.HttpSession 和 org.apache.catalina.Session 之外，它还实现了 java.lang.Serializable 接口来使得 Session 对象可序列化。
+
+StandardEngine
+    类 org.apache.catalina.core.StandardEngine 是 Engine 接口的标准实现，跟 StandardContext 和 StandardHost 相比，StandardEngine 类相对较小。
+    在 Container 容器的顶层，StandardEngine 可以有子容器，它的子容器必须是主机（host）。如果你尝试给它添加一个非主机容器，会产生异常。
+
+
+Service 服务
+    org.apache.catalina.Service 接口用于表示服务。一个服务可以可以有一个容器和多个连接器。你可以添加多个连接器 ，并将它们跟容器相关联.
+
+    StandardService 类
+    org.apache.catalina.core.StandardService 类是 Service 接口的标准实现。 StandardService 类的 initialize 方法初始化所有的添加到该服务的连接器。
+    该类还实现了 org.apache.catalina.Lifecycle 接口， 所以调用它的 start 方法能启动所有的连接器和容器.
+
+    一个 StandardService 实例包括两种组件：一个容器和多个连接器。多个连接器可以使得 Tomcat 能服务于多个协议。
+    一个协议用处处理 HTTP 请求，另一个用于处理 HTTPS 请求。
+    StandardService 类用 container 变量来持有容器实例，用 connectors 数组来持有所有的连接器
+
+
+
+Server  服务器
+    org.apache.catalina.Server 接口表示整个 Catalina Servlet 容器以及其它组件。
+     一个服务器相当有用， 因为它提供了一种优雅的机制来启动和停止整个系统。不必再单独的启动连接器和容器了。
+     当服务器启动的时候，它启动它内部的所有组件。然后无限期的等待关闭命令，如果你想要关闭系统，发送一个关闭命令道指定端口即可。当服务器收到正确的关闭指令后，它停止所有组件的服务.
+
+
+Digester
+    xml 解析工具.
+
+CatalinaShutdownHook
+    Tomcat 也有自己的关闭钩子。
+    你可以在org.apache.catalina.startup.Catalina 类中找到它，该类负责启动服务器对象以管理其它组件。
+    在该类中有一个内部类 CatalinaShutdownHook 继承了java.lang.Thread 类，在该类的 run 方法中调用了服务器的 stop 方法.
+
+Bootstrap
+    类org.apache.catalina.startup.Bootstrap 类提供了 Tomcat 的启动入口。
+    当你运行 startup.bat 或者是 startup.sh 的时候，实际上运行的就是该类中的主方法。
+    主方法创建三个类加载器并初始化 Catalina 类，然后调用 Catalina 的 process 方法.

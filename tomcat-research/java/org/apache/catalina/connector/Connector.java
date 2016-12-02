@@ -66,6 +66,10 @@ public class Connector extends LifecycleMBeanBase {
     }
 
     public Connector(String protocol) {
+
+        // org.apache.coyote.http11.Http11NioProtocol server.xml里面配置的 protocol="HTTP/1.1"
+        // org.apache.coyote.ajp.AjpNioProtocol         server.xml里面配置的 protocol="AJP/1.3"
+
         setProtocol(protocol);
         // Instantiate protocol handler
         ProtocolHandler p = null;
